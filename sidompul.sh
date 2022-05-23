@@ -1,10 +1,11 @@
 #!/bin/sh
 
 nomer_hp="$1"
-email="YOUREMAIL@gmail.com"
+email="YOUREMAILHERE@gmail.com"
 file_output="/tmp/xl.json"
 
 login() {
+	echo "Login $email..."
 	curl -sH 'x-dynatrace: MT_3_2_763403741_15-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_30_456_73' \
 	-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
 	-H 'language: en' -H 'version: 4.1.2' -H 'user-agent: okhttp/3.12.1' \
@@ -38,6 +39,7 @@ send_otp() {
 	fi
 }
 cek_kuota_data() {
+	echo "Cek kuota $nomer_hp..."
 	curl -sH 'x-dynatrace: MT_3_1_763403741_16-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_396_167' \
 	-H 'accept: application/json' -H "authorization: Bearer $accessToken" \
 	-H 'language: en' -H 'version: 4.1.2' -H 'user-agent: okhttp/3.12.1' \
