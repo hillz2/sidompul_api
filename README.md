@@ -3,7 +3,8 @@ Hasil sniff API dari APK Sidompul XL. Cara menggunakan:
 1. Clone repository ini: `git clone https://github.com/hillz2/sidompul_api.git`
 2. Edit variable "email" di script sidompul.sh dengan email yang sudah di daftarkan di aplikasi Sidompul XL
 3. Set executable: `chmod +x sidompul.sh`
-4. Jalankan script: `./sidompul.sh [Nomer XL, nomer harus dalam format 628xxx]`
+4. Jika email yang dipakai sudah login terlebih dahulu di aplikasi Sidompul smartphone, logout dulu, emailnya nggak bisa untuk multi login
+5. Jalankan script: `./sidompul.sh [Nomer XL, nomer harus dalam format 628xxx]`
 
 Contoh Output:
 ```
