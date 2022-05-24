@@ -82,12 +82,14 @@ cek_kuota_data() {
 		jq '.result.data' $file_output | awk -F '"' '{print $2 ": " $4}' | sed '/: $/d; /^: /d; s/^name/\nname/g' | awk '{print toupper($0)}'
 	else
 		statusDescription=$(cat $file_output | jq --raw-output '.statusDescription')
+		errorMessage=$(jq --raw-output '.result.errorMessage' $file_output)
 		echo "[$statusCode] $statusDescription"
+		echo "$errorMessage"
 		exit 100
 	fi
 }
 logout_xl(){
-	curl -H 'x-dynatrace: MT_3_4_763403741_22-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_284_143' \
+	curl -sH 'x-dynatrace: MT_3_4_763403741_22-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_284_143' \
 	-H 'accept: application/json' -H "authorization: Bearer $accessToken" -H 'language: en' \
 	-H 'version: 4.1.2' -H 'user-agent: okhttp/3.12.1' \
 	-X POST https://srg-txl-login-controller-service.ext.dp.xl.co.id/v3/auth/logout \
