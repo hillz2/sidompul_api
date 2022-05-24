@@ -56,7 +56,7 @@ cek_kuota_data() {
 		#echo "Package: $packageName"
 		#echo "Exp: $expDate"
 		#echo "App quota: $bname ($quota / $remaining left)"
-		jq '.result.data' $file_output | awk -F '"' '{print $2 ": " $4}' | sed '/^: /d' | awk '{print toupper($0)}'
+		jq '.result.data' $file_output | awk -F '"' '{print $2 ": " $4}' | sed '/: $/d; /^: /d; s/^name/\nname/g' | awk '{print toupper($0)}'
 	else
 		statusDescription=$(cat $file_output | jq --raw-output '.statusDescription')
 		echo "[$statusCode] $statusDescription"
