@@ -1,15 +1,15 @@
 #!/bin/sh
 
 nomer_hp="$1"
-email=""
+login_email=""
 file_output="/tmp/xl.json"
 
 login() {
-	echo "Login $email..."
+	echo "Login $login_email..."
 	curl -sH 'x-dynatrace: MT_3_2_763403741_15-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_30_456_73' \
 	-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
 	-H 'language: en' -H 'version: 4.1.2' -H 'user-agent: okhttp/3.12.1' \
-	-X POST https://srg-txl-login-controller-service.ext.dp.xl.co.id/v2/auth/email/${email} \
+	-X POST https://srg-txl-login-controller-service.ext.dp.xl.co.id/v2/auth/email/${login_email} \
 	-o "$file_output"
 	statusCode=$(cat $file_output | jq --raw-output '.statusCode')
 	if [[ "$statusCode" == 200 ]]; then
@@ -25,13 +25,13 @@ send_otp() {
 	curl -sH 'x-dynatrace: MT_3_2_763403741_15-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_30_456_73' \
 	-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
 	-H 'language: en' -H 'version: 4.1.2' -H 'user-agent: okhttp/3.12.1' \
-	-X GET https://srg-txl-login-controller-service.ext.dp.xl.co.id/v2/auth/email/${email}/${otp}/000000000000000 \
+	-X GET https://srg-txl-login-controller-service.ext.dp.xl.co.id/v2/auth/email/${login_email}/${otp}/000000000000000 \
 	-o "$file_output"
 	statusCode=$(cat $file_output | jq --raw-output '.statusCode')
 	if [[ "$statusCode" == 200 ]]; then
 		accessToken=$(cat $file_output | jq --raw-output '.result.data.accessToken')
 		refreshToken=$(cat $file_output | jq --raw-output '.result.data.refreshToken')
-		jq --null-input --arg at "$accessToken" --arg rt "$refreshToken" '{"accessToken": $at, "refreshToken": $rt}' > xl.token
+		jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > xl.token
 		echo "OTP Verified..."
 		echo "Access Token: $accessToken"
 		echo "Refresh Token: $refreshToken"
@@ -43,25 +43,31 @@ send_otp() {
 }
 refresh_token() {
 	if [[ -f "xl.token" ]]; then
-		echo "Refreshing token..."
-		refreshToken=$(jq --raw-output '.refreshToken' xl.token)
-		curl -sH 'x-dynatrace: MT_3_3_763403741_21-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_209_44' \
-		-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
-		-H 'language: en' -H 'version: 4.1.2' -H 'content-type: application/x-www-form-urlencoded' \
-		-H 'user-agent: okhttp/3.12.1' \
-		-X POST https://srg-txl-login-controller-service.ext.dp.xl.co.id/v1/login/token/refresh \
-		-d "grant_type=refresh_token&refresh_token=$refreshToken&imei=000000000000000" \
-		-o "$file_output"
-		statusCode=$(cat $file_output | jq --raw-output '.statusCode')
-		if [[ "$statusCode" == 200 ]]; then
-			accessToken=$(jq --raw-output '.result.accessToken' "$file_output")
-			refreshToken=$(jq --raw-output '.result.refreshToken' "$file_output")
-			jq --null-input --arg at "$accessToken" --arg rt "$refreshToken" '{"accessToken": $at, "refreshToken": $rt}' > xl.token
-			echo "Token refreshed"
+		emailToken=$(jq --raw-output '.emailToken' xl.token)
+		if [[ "$login_email" == "$emailToken" ]]; then
+			echo "Refreshing token..."
+			refreshToken=$(jq --raw-output '.refreshToken' xl.token)
+			curl -sH 'x-dynatrace: MT_3_3_763403741_21-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_209_44' \
+			-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
+			-H 'language: en' -H 'version: 4.1.2' -H 'content-type: application/x-www-form-urlencoded' \
+			-H 'user-agent: okhttp/3.12.1' \
+			-X POST https://srg-txl-login-controller-service.ext.dp.xl.co.id/v1/login/token/refresh \
+			-d "grant_type=refresh_token&refresh_token=$refreshToken&imei=000000000000000" \
+			-o "$file_output"
+			statusCode=$(cat $file_output | jq --raw-output '.statusCode')
+			if [[ "$statusCode" == 200 ]]; then
+				accessToken=$(jq --raw-output '.result.accessToken' "$file_output")
+				refreshToken=$(jq --raw-output '.result.refreshToken' "$file_output")
+				jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > xl.token
+				echo "Token refreshed"
+			else
+				echo "Failed to refresh the token"
+				statusDescription=$(cat $file_output | jq --raw-output '.statusDescription')
+				echo "[$statusCode] $statusDescription"
+				login
+				send_otp
+			fi
 		else
-			echo "Failed to refresh the token"
-			statusDescription=$(cat $file_output | jq --raw-output '.statusDescription')
-			echo "[$statusCode] $statusDescription"
 			login
 			send_otp
 		fi
