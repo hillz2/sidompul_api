@@ -85,7 +85,7 @@ cek_kuota_data() {
 	-o "$file_output"
 	statusCode=$(cat $file_output | jq --raw-output '.statusCode')
 	if [[ "$statusCode" == 200 ]]; then
-		jq '.result.data' $file_output | awk -F '"' '{print $2 ": " $4}' | sed '/: $/d; /^: /d; s/^name/\nname/g' | awk '{print toupper($0)}'
+		jq '.result.data' $file_output | awk -F '"' '{print toupper($2 ": " $4)}' | sed '/: $/d; /^: /d; s/^NAME/\nNAME/g' | sed '${s/$/\n\n=====PRESS "q" TO EXIT=====/}' | less
 	else
 		statusDescription=$(cat $file_output | jq --raw-output '.statusDescription')
 		errorMessage=$(jq --raw-output '.result.errorMessage' $file_output)
