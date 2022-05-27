@@ -1,6 +1,7 @@
 #!/bin/sh
 
 nomer_hp="$1"
+nomer_hp=$(echo "$nomer_hp" | sed 's/^08/628/')
 login_email=""
 file_output="/tmp/xl.json"
 
