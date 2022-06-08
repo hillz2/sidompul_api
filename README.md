@@ -1,11 +1,12 @@
 # Hasil sniff API APK Sidompul XL
 Hasil sniff API dari APK Sidompul XL. Cara menggunakan:
-1. Clone repository ini: `git clone https://github.com/hillz2/sidompul_api.git`
-2. Change direcotry: `cd sidompul_api`
-3. Edit variable "login_email" di script sidompul.sh dengan email yang sudah di daftarkan di aplikasi Sidompul XL
-4. Set executable: `chmod +x sidompul.sh`
-5. Jika email yang dipakai sudah login di aplikasi Sidompul smartphone, logout dulu, emailnya nggak bisa untuk multi login
-6. Jalankan script: `./sidompul.sh [Nomer XL]`
+1. Khusus OpenWrt, jalankan ini dulu: opkg update && opkg install git-http
+2. Clone repository ini: `git clone https://github.com/hillz2/sidompul_api.git`
+3. Change direcotry: `cd sidompul_api`
+4. Edit variable "login_email" di script sidompul.sh dengan email yang sudah di daftarkan di aplikasi Sidompul XL
+5. Set executable: `chmod +x sidompul.sh`
+6. Jika email yang dipakai sudah login di aplikasi Sidompul smartphone, logout dulu, emailnya nggak bisa untuk multi login
+7. Jalankan script: `./sidompul.sh [Nomer XL]`
 
 Contoh Output:
 ```
