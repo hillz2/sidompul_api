@@ -1,6 +1,6 @@
 # Hasil sniff API APK Sidompul XL
 Hasil sniff API dari APK Sidompul XL. Cara menggunakan:
-1. Khusus OpenWrt, jalankan ini dulu: opkg update && opkg install git-http
+1. Khusus OpenWrt, jalankan ini dulu: `opkg update && opkg install git-http`
 2. Clone repository ini: `git clone https://github.com/hillz2/sidompul_api.git`
 3. Change direcotry: `cd sidompul_api`
 4. Edit variable "login_email" di script sidompul.sh dengan email yang sudah di daftarkan di aplikasi Sidompul XL
