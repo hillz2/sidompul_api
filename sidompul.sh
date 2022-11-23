@@ -32,7 +32,7 @@ send_otp() {
 	if [[ "$statusCode" == 200 ]]; then
 		accessToken=$(cat $file_output | jq --raw-output '.result.data.accessToken')
 		refreshToken=$(cat $file_output | jq --raw-output '.result.data.refreshToken')
-		jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > xl.token
+		jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > /tmp/xl.token
 		echo "OTP Verified..."
 		echo "Access Token: $accessToken"
 		echo "Refresh Token: $refreshToken"
@@ -43,11 +43,11 @@ send_otp() {
 	fi
 }
 refresh_token() {
-	if [[ -f "xl.token" ]]; then
-		emailToken=$(jq --raw-output '.emailToken' xl.token)
+	if [[ -f "/tmp/xl.token" ]]; then
+		emailToken=$(jq --raw-output '.emailToken' /tmp/xl.token)
 		if [[ "$login_email" == "$emailToken" ]]; then
 			echo "Refreshing token..."
-			refreshToken=$(jq --raw-output '.refreshToken' xl.token)
+			refreshToken=$(jq --raw-output '.refreshToken' /tmp/xl.token)
 			curl -sH 'x-dynatrace: MT_3_3_763403741_21-0_a5734da2-0ecb-4c8d-8d21-b008aeec4733_0_209_44' \
 			-H 'accept: application/json' -H 'authorization: Basic ZGVtb2NsaWVudDpkZW1vY2xpZW50c2VjcmV0' \
 			-H 'language: en' -H 'version: 4.1.2' -H 'content-type: application/x-www-form-urlencoded' \
@@ -59,7 +59,7 @@ refresh_token() {
 			if [[ "$statusCode" == 200 ]]; then
 				accessToken=$(jq --raw-output '.result.accessToken' "$file_output")
 				refreshToken=$(jq --raw-output '.result.refreshToken' "$file_output")
-				jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > xl.token
+				jq --null-input --arg et "$login_email" --arg at "$accessToken" --arg rt "$refreshToken" '{"emailToken": $et, "accessToken": $at, "refreshToken": $rt}' > /tmp/xl.token
 				echo "Token refreshed"
 			else
 				echo "Failed to refresh the token"
